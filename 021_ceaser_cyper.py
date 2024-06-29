@@ -9,25 +9,24 @@ def ceasar(cipher_direction, input_text, shift_amount):
 
     cypher_text=""
 
-    for letter in input_text:
+    for char in input_text:
 
-        if not letter in alphabet: 
-            cypher_text += letter
-            continue
+        if char in alphabet: 
+            position = alphabet.index(char) 
 
-        position = alphabet.index(letter) 
+            if cipher_direction == "decode": 
+                new_position = position - shift_amount
+                if(new_position < 0): # index in -ve
+                    new_position = (len(alphabet)) + new_position # go to end index
 
-        if cipher_direction == "decode": 
-            new_position = position - shift_amount
-            if(new_position < 0): # index in -ve
-                new_position = (len(alphabet)) + new_position # go to end index
-
-        elif cipher_direction == "encode":
-            new_position = position + shift_amount
-            if(new_position > len(alphabet)-1): # if index is out of range
-                new_position = (new_position % (len(alphabet))) # circle back to begin index
-            
-        cypher_text += alphabet[new_position]
+            elif cipher_direction == "encode":
+                new_position = position + shift_amount
+                if(new_position > len(alphabet)-1): # if index is out of range
+                    new_position = (new_position % (len(alphabet))) # circle back to begin index
+                
+            cypher_text += alphabet[new_position]
+        else:
+            cypher_text += char
    
     print(f"The {cipher_direction}d text is <<{cypher_text}>>")
 
@@ -45,10 +44,7 @@ def main():
 
         text = input("Type your message:\n").lower()
 
-        shift = int(input("Type the shift number:\n"))
-        if(shift > len(alphabet)-1): 
-            print(f"direction too large, max is {len(alphabet)-1}")
-            continue
+        shift = int(input("Type the shift number:\n")) % len(alphabet)
 
         ceasar(direction, input_text=text, shift_amount=shift) 
 
