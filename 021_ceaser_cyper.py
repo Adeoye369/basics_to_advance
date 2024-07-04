@@ -33,6 +33,8 @@ def ceasar(cipher_direction, input_text, shift_amount):
 
 
 def main():
+    """The is  the main function to do all the logics
+    """
     print(ceaser_logo)
 
     terminal="Y"
@@ -51,3 +53,4 @@ def main():
         terminal= input("Type 'Y' to start or 'N' to exit:\n ").upper()
     
 main()
+
