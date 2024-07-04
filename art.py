@@ -9,3 +9,11 @@ cccc    cc    aaaaaaaaaa       rrrrr    000ll
 
 Welcome to `Cal` where you can HAVE FUN share messages 😉😉😉
 '''
+
+blackjack_logo = """
+            BBBBB   \\    JJJJJJJ
+            B   BBB  \\        JJ
+            BBBBBB    \\       JJ
+            B   BBB    \\ JJ   JJ
+            BBBBBB      \\  JJJJ
+"""
