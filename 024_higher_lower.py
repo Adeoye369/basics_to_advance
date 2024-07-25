@@ -34,22 +34,30 @@ def check_user_guess(data1, data2, guess):
 user_score = 0
    
 # data 1, data 2
-current_data = gen_random_account()
+acctA_data = gen_random_account()
 
-while current_data != None:
+while acctA_data != None:
 
-    next_data = gen_random_account()
+    acctB_data = gen_random_account()
 
     # Case of same data, get new random acct.
-    if current_data == next_data:
-        next_data = gen_random_account()
+    if acctA_data == acctB_data:
+        acctB_data = gen_random_account()
 
     # Ask user which is greater data1 or data 2
-    user_suggest = input(f"\nthe acct. A=>  {current_data['name']} has {current_data['follower_count']} Million follwers,\nand acct. B=> is {next_data['name']}, is B Higer or Lower(H\L): ").upper()
+    user_suggest = input(f"\nthe acct. A=>  {acctA_data['name']} has {acctA_data['follower_count']} Million follwers,\nand acct. B=> is {acctB_data['name']}, is B Higer or Lower(H\L): ").upper()
 
-    current_data = check_user_guess(data1=current_data, data2=next_data, guess=user_suggest)
-    if current_data == None:
+    acctA_data = check_user_guess(data1=acctA_data, data2=acctB_data, guess=user_suggest)
+    if acctA_data == None:
         print("sorry! You Lose, Your score is ", user_score )
     else:
         user_score+= 1
+
+
+
+
+
+
+
+
 
