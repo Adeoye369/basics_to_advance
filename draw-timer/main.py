@@ -13,12 +13,19 @@ class Draw_app():
         self.reps = 0
         self.count_up = 0
         self.count_up_list = []
+
         self.canvas = None
         self.drawtime_entry = None
         self.timer = None
 
         # help to know when to switch countdown display
         self.is_break = False 
+
+        # keep track if countdown is active or not
+        self.start_countdown = False
+        self.is_count_finished = False
+
+        self.g_c = 0 # keep track of count for pause/play
 
         self.root = tk.Tk()
 
@@ -77,7 +84,7 @@ class Draw_app():
    
         self.start_btn = tk.Button(self.playback_frame, text="START", command=self.start_timer)
         self.start_btn.grid(row=0, column=0, sticky="NSEW")
-        self.pause_btn = tk.Button(self.playback_frame, text="PAUSE")
+        self.pause_btn = tk.Button(self.playback_frame, text="PAUSE", command=self.play_pause)
         self.pause_btn.grid(row=1, column=0, sticky="NSEW")
         self.reset_btn = tk.Button(self.playback_frame, text="RESET")
         self.reset_btn.grid(row=2, column=0, sticky="NSEW")
@@ -170,7 +177,6 @@ class Draw_app():
 
         return entry_value 
 
-
     def start_timer(self):
 
         # set the initial time interval conversion
@@ -184,7 +190,10 @@ class Draw_app():
         self.warning_label.config(text = "")
 
         # start first countdown
+        self.start_countdown = True
         self.count_down()
+
+
 
     '''
     Count down timer =====================
@@ -201,57 +210,91 @@ class Draw_app():
         if self.reps %2 == 0 and self.short_break_sec != 0:
             self.is_break = True
             self.time_interval = self.short_break_sec
-            self.update_timer(self.time_interval)
+            self.update_timer(self.time_interval, 0)
 
         else :
             self.is_break = False
             self.time_interval = self.draw_time_min
-            self.update_timer(self.time_interval)
+            self.update_timer(self.time_interval, 0)
         
-
-
     def min_sec(self, count):
         return count // 60, count % 60
 
-    def update_count_up(self):
-        self.count_up = self.count_up - 1 # offset by 1 error
-        self.count_up_list.append(self.count_up)
-        self.timelist.insert(tk.END, f" {len(self.count_up_list):02d} - {self.min_sec(self.count_up)[0]:02d}:{self.min_sec(self.count_up)[1]:02d}")
+    def update_count_up(self, c):
+        self.count_up_list.append(c)
+        self.timelist.insert(tk.END, f" {len(self.count_up_list):02d} - {self.min_sec(c)[0]:02d}:{self.min_sec(c)[1]:02d}")
         self.count_up = 0
 
     '''
     update timer =========================================================
     '''
-    def update_timer(self, count):
+    def update_timer(self, count, count_up):
 
-        # update timer text
-        self.min, self.sec = self.min_sec(count)
+        # check if to start countdown
+        if self.start_countdown or self.is_break: 
+            # update timer text
+            self.min, self.sec = self.min_sec(count)
 
-        # update canvas circle
-        self.angle = math.floor((count/self.time_interval)*359)
-        # print(self.angle)
-        if self.angle < 0: self.angle = 360 # Reset if completed circle
-        self.canvas.itemconfig(self.arc, extent=self.angle, outline="blue" if self.angle >= 30 else "red")
-        
-        if not self.is_break:
-            # Update canvas text normal interval
-            self.count_up += 1
-            self.canvas.itemconfig(self.timer_text, text=f"{self.min:02d}:{self.sec:02d}" )
-        else:    
-            # Update canvas text for break time
-            self.canvas.itemconfig(self.timer_text, text=f"{self.sec}" )
+            # update canvas circle
+            self.angle = math.floor((count/self.time_interval)*359)
+            # print(self.angle)
+            if self.angle < 0: self.angle = 360 # Reset if completed circle
+            self.canvas.itemconfig(self.arc, extent=self.angle, outline="blue" if self.angle >= 30 else "red")
             
-        # Count only positive values
-        if count > 0:
-            self.timer = self.root.after(1000, self.update_timer, count - 1)
-       
-        else: # Count has finished restart count
+            if not self.is_break:
+                # Update canvas text normal interval
+                self.g_c = count
+                self.canvas.itemconfig(self.timer_text, text=f"{self.min:02d}:{self.sec:02d}" )
+                self.pause_btn.config(state=tk.NORMAL)
+                
+            else:    
+                # break time countdown display
+                self.canvas.itemconfig(self.timer_text, text=f"{self.sec}" )
+                # prohibit clicking of pause btn
+                self.pause_btn.config(state=tk.DISABLED)
+                
+            # Count only positive values,
+            if count > 0:
+                    self.timer = self.root.after(1000, self.update_timer, count - 1, count_up + 1)
+        
+            else: # Count has finished restart count
 
-            # Store and Display the count_up value 
-            if not self.is_break: self.update_count_up()
+                # Store and Display the count_up value 
+                if not self.is_break:
+                    self.update_count_up(count_up)
 
-            # start countdown again
-            self.count_down()
+                # start countdown again
+                self.count_down()
+
+
+    '''
+    Reset and Pause ======================================================
+    '''
+
+    def play_pause(self):
+
+        if not self.is_count_finished: # not done
+            self.start_countdown = not self.start_countdown # stop count
+
+            # continue countdown
+            if self.g_c > 0 and self.start_countdown:
+                self.pause_btn.config(text="PAUSE")
+                self.update_timer(self.g_c, 0)
+            else:
+                self.pause_btn.config(text="PLAY")
+
+
+        # ---------------------------- TIMER RESET ------------------------------- # 
+    
+        # def reset_timer():
+        #     global reps
+        #     reps = 0
+        #     root.after_cancel(timer)
+        #     canvas.itemconfig(timer_text, text="00:00")
+        #     title_label.config(text="Timer")
+        #     checks_label.config(text="")
+
+
 
 
 if __name__ == "__main__":
