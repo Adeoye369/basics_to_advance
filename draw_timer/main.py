@@ -5,6 +5,7 @@ import math
 
 
 class Draw_app():
+    
     def __init__(self) -> None:
         # Default
         self.angle = 0
@@ -21,11 +22,14 @@ class Draw_app():
         # help to know when to switch countdown display
         self.is_break = False 
 
+        # when to skip the draw timer
+        self.is_skip = False
+
         # keep track if countdown is active or not
         self.start_countdown = False
         self.is_count_finished = False
 
-        self.g_c = 0 # keep track of count for pause/play
+        self.count_dwn = 0 # keep track of count for pause/play
 
         self.root = tk.Tk()
 
@@ -54,21 +58,47 @@ class Draw_app():
         self.menu_frame = tk.LabelFrame(self.root, text="Menu", padx=10, pady=10)
         self.menu_frame.grid(row=1, column=0, sticky="NSEW")
 
+        # Radio Button to display time select
+                # Radio Button ==============>
+        def radio_action():
+            print(radio_state.get())
+            self.drawtime_entry.delete(0, tk.END)
+            self.drawtime_entry.insert(tk.END,radio_state.get())
+
+        # variable to hold which value is checked
+        radio_state = tk.IntVar()
+
+        self.radiobtn1 = tk.Radiobutton(self.menu_frame, text="30 sec", value=30, variable=radio_state, command=radio_action)
+        self.radiobtn2 = tk.Radiobutton(self.menu_frame, text="60 sec", value=60, variable=radio_state, command=radio_action)
+        self.radiobtn3 = tk.Radiobutton(self.menu_frame, text="2 mins", value=60*2, variable=radio_state, command=radio_action)
+        self.radiobtn4 = tk.Radiobutton(self.menu_frame, text="3 mins", value=60*3, variable=radio_state, command=radio_action)
+        self.radiobtn5 = tk.Radiobutton(self.menu_frame, text="5 mins", value=60*5, variable=radio_state, command=radio_action)
+        self.radiobtn6 = tk.Radiobutton(self.menu_frame, text="10 mins", value=60*10, variable=radio_state, command=radio_action)
+        
+        self.radiobtn1.grid(row=0, column=0)
+        self.radiobtn2.grid(row=0, column=1)
+        self.radiobtn3.grid(row=1, column=0)
+        self.radiobtn4.grid(row=1, column=1)
+        self.radiobtn5.grid(row=2, column=0)
+        self.radiobtn6.grid(row=2, column=1)
+
         # Display the time for the drawing interval
-        self.drawtime_label = tk.Label(self.menu_frame, text="Draw Time(min)")
-        self.drawtime_entry = tk.Entry(self.menu_frame, width=10)
-        self.drawtime_entry.insert(tk.END, string="1")
+        self.drawtime_label = tk.Label(self.menu_frame, text="Time(sec)")
+
+        self.drawtime_entry = tk.Entry(self.menu_frame, width=8)
+        self.drawtime_entry.insert(tk.END, string="15")
+
         self.warning_label = tk.Label(self.menu_frame, text="", fg="red", font=("Arial", 10, "italic"))
-        self.drawtime_label.pack()
-        self.drawtime_entry.pack()
-        self.warning_label.pack()
+        self.drawtime_label.grid(row=3, column=0)
+        self.drawtime_entry.grid(row=3, column=1)
+        self.warning_label.grid(row=4, column=0, columnspan=2)
 
         # break time between each drawing 
         self.break_val = tk.IntVar()
         self.break_slider = tk.Scale(self.menu_frame, from_=0, to=15, variable=self.break_val, orient=tk.HORIZONTAL)
         self.break_label = ttk.Label(self.menu_frame, text="breaks (sec)" )
-        self.break_label.pack()
-        self.break_slider.pack(pady=0)
+        self.break_label.grid(row=5, column=0, columnspan=2)
+        self.break_slider.grid(row=6, column=0, columnspan=2)
 
         ### ================ PLAYBACK - FRAME ===================== ###
         # playback Frame
@@ -86,13 +116,13 @@ class Draw_app():
         self.start_btn.grid(row=0, column=0, sticky="NSEW")
         self.pause_btn = tk.Button(self.playback_frame, text="PAUSE", command=self.play_pause)
         self.pause_btn.grid(row=1, column=0, sticky="NSEW")
-        self.reset_btn = tk.Button(self.playback_frame, text="RESET")
+        self.reset_btn = tk.Button(self.playback_frame, text="RESET", command=self.reset_timer)
         self.reset_btn.grid(row=2, column=0, sticky="NSEW")
 
     def create_durationList_UI(self ):
         ### ================ ELAPSED TIME FRAME ============ ###
         self.elap_time_frame = tk.LabelFrame(self.root, text="Elapsed Time", padx=10, pady=10)
-        self.elap_time_frame.grid(row=1, column=2, rowspan=2)
+        self.elap_time_frame.grid(row=1, column=2, rowspan=3, sticky='NS')
         tk.Grid.rowconfigure(self.elap_time_frame, 0, weight=1)
 
         # Display list of Elapsed time
@@ -124,7 +154,7 @@ class Draw_app():
         self.canvas_circular_progress()
 
         # Skip Label
-        self.skip_button = tk.Button(self.timer_frame_label, text="SKIP TO NEXT")
+        self.skip_button = tk.Button(self.timer_frame_label, text="SKIP TO NEXT", command=self.skip_countdown)
         self.skip_button.grid(row=2, column=1, sticky="S", padx=20, pady=20)
 
     def canvas_text(self):
@@ -162,7 +192,7 @@ class Draw_app():
                 self.warning_label.config(text = "Time is empty, will use default")
                 return default_entry
              
-            entry_value = int(float(entry_value) * 60)
+            entry_value = int(float(entry_value))
 
             if(entry_value == 0): 
                 self.warning_label.config(text = "Zero value, will use default")
@@ -180,7 +210,6 @@ class Draw_app():
     def start_timer(self):
 
         # set the initial time interval conversion
-        self.init_time_interval = self.get_and_validate_drawtime()
 
         if(self.time_interval < 0):
             self.warning_label.config(text = "Time to small")
@@ -193,12 +222,7 @@ class Draw_app():
         self.start_countdown = True
         self.count_down()
 
-
-
-    '''
-    Count down timer =====================
-    
-    '''
+    '''============= Count down timer ===================== '''
     def count_down(self):
 
         # get the value assigned to slider
@@ -225,37 +249,48 @@ class Draw_app():
         self.timelist.insert(tk.END, f" {len(self.count_up_list):02d} - {self.min_sec(c)[0]:02d}:{self.min_sec(c)[1]:02d}")
         self.count_up = 0
 
-    '''
-    update timer =========================================================
-    '''
-    def update_timer(self, count, count_up):
+    '''============ update timer ==========='''
+    def update_timer(self, count_dwn, count_up):
+
 
         # check if to start countdown
         if self.start_countdown or self.is_break: 
+
+            # disable Start button to avoid multiple countdown
+            self.start_btn.config(state=tk.DISABLED)
+
             # update timer text
-            self.min, self.sec = self.min_sec(count)
+            self.min, self.sec = self.min_sec(count_dwn)
+
+            # update count up
+            self.count_up = count_up
 
             # update canvas circle
-            self.angle = math.floor((count/self.time_interval)*359)
+            self.angle = math.floor((count_dwn/self.time_interval)*359)
             # print(self.angle)
             if self.angle < 0: self.angle = 360 # Reset if completed circle
             self.canvas.itemconfig(self.arc, extent=self.angle, outline="blue" if self.angle >= 30 else "red")
-            
+
+
+
             if not self.is_break:
                 # Update canvas text normal interval
-                self.g_c = count
+                self.count_dwn = count_dwn
                 self.canvas.itemconfig(self.timer_text, text=f"{self.min:02d}:{self.sec:02d}" )
                 self.pause_btn.config(state=tk.NORMAL)
-                
+                self.reset_btn.config(state=tk.NORMAL)
+                 
             else:    
                 # break time countdown display
                 self.canvas.itemconfig(self.timer_text, text=f"{self.sec}" )
+                self.canvas.itemconfig(self.arc, outline="#999922")
                 # prohibit clicking of pause btn
                 self.pause_btn.config(state=tk.DISABLED)
+                self.reset_btn.config(state=tk.DISABLED)
                 
             # Count only positive values,
-            if count > 0:
-                    self.timer = self.root.after(1000, self.update_timer, count - 1, count_up + 1)
+            if count_dwn > 0:
+                    self.timer = self.root.after(1000, self.update_timer, count_dwn - 1, count_up + 1)
         
             else: # Count has finished restart count
 
@@ -266,10 +301,7 @@ class Draw_app():
                 # start countdown again
                 self.count_down()
 
-
-    '''
-    Reset and Pause ======================================================
-    '''
+    '''============ Reset and Pause ==============='''
 
     def play_pause(self):
 
@@ -277,23 +309,30 @@ class Draw_app():
             self.start_countdown = not self.start_countdown # stop count
 
             # continue countdown
-            if self.g_c > 0 and self.start_countdown:
+            if self.count_dwn > 0 and self.start_countdown:
                 self.pause_btn.config(text="PAUSE")
-                self.update_timer(self.g_c, 0)
+                self.update_timer(self.count_dwn, self.count_up)
             else:
                 self.pause_btn.config(text="PLAY")
+                self.canvas.itemconfig(self.arc, outline="#00ddee")
 
-
-        # ---------------------------- TIMER RESET ------------------------------- # 
-    
-        # def reset_timer():
-        #     global reps
-        #     reps = 0
-        #     root.after_cancel(timer)
-        #     canvas.itemconfig(timer_text, text="00:00")
-        #     title_label.config(text="Timer")
-        #     checks_label.config(text="")
-
+    # ---------------------------- TIMER RESET ------------------------------- # 
+    def reset_timer(self):
+        self.is_break = False
+        self.start_countdown = False
+        self.reps = 0
+        self.count_dwn = 0
+        self.root.after_cancel(self.timer)
+        self.canvas.itemconfig(self.timer_text , text="00:00")
+        self.canvas.itemconfig(self.arc, extent=360, outline="gray")
+        self.start_btn.config(state=tk.NORMAL)
+            
+    # --------------------- SKIP TIMER --------------------------#############
+    def skip_countdown(self):
+        # update timelist
+        self.update_count_up(self.count_up)
+        self.reset_timer()
+        self.start_timer()
 
 
 
