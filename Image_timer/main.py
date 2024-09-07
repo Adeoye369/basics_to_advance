@@ -45,9 +45,10 @@ class Draw_App():
         label1 = tk.Label(self.top1, text=f"Image:{filename}")
         label1.pack()
 
-        canvas_width = image.width()
-        canvas_height = image.height() 
-        self.canvas = tk.Canvas(self.top1)
+        canvas_width = image.width() +20
+        canvas_height = image.height() +20 
+
+        self.canvas = tk.Canvas(self.top1, width=canvas_width, height=canvas_height)
         self.canvas.pack(padx=10, pady=10)
         self.canvas.create_image(canvas_width/2, canvas_height/2, image=image)
 
