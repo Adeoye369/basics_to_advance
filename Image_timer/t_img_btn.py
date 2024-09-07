@@ -44,8 +44,7 @@ def openfile():
     display_images(new_img_files)
 
 
-
-img_btn_list={} # Container to hold the images
+img_btn_list = {} # Container to hold the images
 
 def display_images(img_files):
     index = 0
