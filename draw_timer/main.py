@@ -227,7 +227,7 @@ class Draw_app():
 
         # get the value assigned to slider
         self.short_break_sec = self.break_val.get()
-        self.draw_time_min = self.get_and_validate_drawtime()
+        self.draw_time_sec = self.get_and_validate_drawtime()
         self.reps += 1
 
         # switch between `initial time interval` and `break time interval`
@@ -238,7 +238,7 @@ class Draw_app():
 
         else :
             self.is_break = False
-            self.time_interval = self.draw_time_min
+            self.time_interval = self.draw_time_sec
             self.update_timer(self.time_interval, 0)
         
     def min_sec(self, count):
@@ -251,8 +251,7 @@ class Draw_app():
 
     '''============ update timer ==========='''
     def update_timer(self, count_dwn, count_up):
-
-
+        
         # check if to start countdown
         if self.start_countdown or self.is_break: 
 

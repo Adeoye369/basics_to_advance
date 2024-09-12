@@ -33,3 +33,6 @@ def load_image(filepath, new_width = None, new_height= None, reduce_by=1) :
 
     return img
 
+
+def min_sec(count):
+    return count // 60, count % 60
