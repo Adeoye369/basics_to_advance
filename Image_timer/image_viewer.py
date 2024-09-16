@@ -3,7 +3,7 @@ from utility import load_image
 from functools import partial
 import os
 
-from tkinter import Button, Label, Canvas, Toplevel, LEFT
+from tkinter import ttk, Label, Canvas, Toplevel, TOP
 
 
 class ImageViewer():
@@ -39,15 +39,15 @@ class ImageViewer():
 
     def process_image(self, image_path):
         ''' Convert image path to tk image thumb and full image'''
-        thumb_size = 70
+        thumb_size = 80
         self._name = os.path.splitext(os.path.basename(image_path))[0] # get the name
         self._thumb_img = ImageTk.PhotoImage(load_image(image_path, thumb_size))
         self._full_img =ImageTk.PhotoImage(load_image(image_path))
 
     def display_button(self, root, row, col):
         ''' Display the Button of the image'''
-        self._img_btn = Button(root, image=self._thumb_img, compound=LEFT, 
-                                text= f"{self._name[:6]}..." if len(self._name)> 6 else self._name,
+        self._img_btn = ttk.Button(root, image=self._thumb_img, compound=TOP, 
+                                text= f"{self._name[:10]}..." if len(self._name)> 10 else self._name,
                                  command=self.view_image)
             
         self._img_btn.grid(row=row ,column=col)
@@ -85,3 +85,6 @@ class ImageViewer():
         canvas = Canvas(root, width=w, height=h)
         canvas.create_image(w/2, h/2, image=tk_img)
         return canvas
+    
+    def delete_image(self):
+        self._img_btn.destroy()

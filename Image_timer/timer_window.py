@@ -1,13 +1,17 @@
 import tkinter as tk
-from utility import min_sec
+from tkinter import ttk
+from utility import min_sec,load_image, WidgetUtil
+from PIL import ImageTk
 
 class TimerWindow():
 
-    def __init__(self, image_viewer_list):
+    def __init__(self, image_viewer_list, timer_duration):
         ''' Takes the list of ImageView generated '''
 
-        # stores the ImageViewer list
+        # stores the ImageViewer list and duration
         self.img_viewer_list = image_viewer_list
+        self.time_duration = timer_duration
+
 
         # store slide index
         self.slide_idx = 0
@@ -52,8 +56,7 @@ class TimerWindow():
         self.img_list_frame = tk.LabelFrame(self.time_win, text="Image", padx=10, pady=10)
         self.img_list_frame.grid(row=0, column=1, rowspan=2)
 
-        self.btn0 = tk.Button(  self.settings_frame, text="Btn1")
-        self.btn0.grid(row=0, column=0)
+
 
         self.create_menu_UI()
 
@@ -62,35 +65,43 @@ class TimerWindow():
         self.canvas.grid(row=0, column=0, sticky=tk.NSEW)
 
         # Left Button
-        self.left_btn = tk.Button(self.img_list_frame, text="Left", command=lambda:self.skip_image(-1))
+        self.left_btn_image = ImageTk.PhotoImage(load_image("./image_timer/assets/left_arrow.png", 50))
+        self.left_btn = ttk.Button(self.img_list_frame, image=self.left_btn_image, command=lambda:self.skip_image(-1))
         self.left_btn.grid(row=0, column=0, sticky=tk.W)
 
         # Right Button
-        self.right_btn = tk.Button(self.img_list_frame, text="Right", command=lambda:self.skip_image(1))
+        self.right_btn_image = ImageTk.PhotoImage(load_image("./image_timer/assets/right_arrow.png", 50))
+        self.right_btn = ttk.Button(self.img_list_frame, image=self.right_btn_image, command=lambda:self.skip_image(1))
         self.right_btn.grid(row=0, column=0, sticky=tk.E)
 
         # Start the countdown
         self.start_timer()
+        self.slide_dir(0)
 
     
+
+
+
     def create_menu_UI(self):
         ### ================= MENU FRAME =================== ### 
         # Radio Button to display time select
-                # Radio Button ==============>
+        # Radio Button ==============>
         def radio_action():
-            print(radio_state.get())
+            print(radio_value.get())
             self.drawtime_entry.delete(0, tk.END)
-            self.drawtime_entry.insert(tk.END,radio_state.get())
+            self.drawtime_entry.insert(tk.END,radio_value.get())
+            self.time_duration = radio_value.get()
+        
 
         # variable to hold which value is checked
-        radio_state = tk.IntVar()
+        radio_value = tk.IntVar()
 
-        self.radiobtn1 = tk.Radiobutton(self.settings_frame, text="30 sec", value=30, variable=radio_state, command=radio_action)
-        self.radiobtn2 = tk.Radiobutton(self.settings_frame, text="60 sec", value=60, variable=radio_state, command=radio_action)
-        self.radiobtn3 = tk.Radiobutton(self.settings_frame, text="2 mins", value=60*2, variable=radio_state, command=radio_action)
-        self.radiobtn4 = tk.Radiobutton(self.settings_frame, text="3 mins", value=60*3, variable=radio_state, command=radio_action)
-        self.radiobtn5 = tk.Radiobutton(self.settings_frame, text="5 mins", value=60*5, variable=radio_state, command=radio_action)
-        self.radiobtn6 = tk.Radiobutton(self.settings_frame, text="10 mins", value=60*10, variable=radio_state, command=radio_action)
+        self.radiobtn1 = tk.Radiobutton(self.settings_frame, text="30 sec", value=30, variable=radio_value, command=radio_action)
+        self.radiobtn2 = tk.Radiobutton(self.settings_frame, text="60 sec", value=60, variable=radio_value, command=radio_action)
+        self.radiobtn3 = tk.Radiobutton(self.settings_frame, text="2 mins", value=60*2, variable=radio_value, command=radio_action)
+        self.radiobtn4 = tk.Radiobutton(self.settings_frame, text="3 mins", value=60*3, variable=radio_value, command=radio_action)
+        self.radiobtn5 = tk.Radiobutton(self.settings_frame, text="5 mins", value=60*5, variable=radio_value, command=radio_action)
+        self.radiobtn6 = tk.Radiobutton(self.settings_frame, text="10 mins", value=60*10, variable=radio_value, command=radio_action)
         
         self.radiobtn1.grid(row=0, column=0)
         self.radiobtn2.grid(row=0, column=1)
@@ -103,7 +114,9 @@ class TimerWindow():
         self.drawtime_label = tk.Label(self.settings_frame, text="Time(sec)")
 
         self.drawtime_entry = tk.Entry(self.settings_frame, width=8)
-        self.drawtime_entry.insert(tk.END, string="5")
+        print(f"passing in time_duration: {self.time_duration}" )
+        self.drawtime_entry.insert(tk.END, string=f"{self.time_duration}")
+
 
         self.warning_label = tk.Label(self.settings_frame, text="", fg="red", font=("Arial", 10, "italic"))
         self.drawtime_label.grid(row=3, column=0)
@@ -126,25 +139,23 @@ class TimerWindow():
         self.playback_frame.grid(row=1, column=0, sticky="NSEW")
         self.playback_frame.columnconfigure(0, weight=1)
 
-   
-        self.start_btn = tk.Button(self.playback_frame, text="START", command=self.start_timer)
-        self.start_btn.grid(row=0, column=0, sticky="NSEW")
+
         self.pause_btn = tk.Button(self.playback_frame, text="PAUSE", command=self.play_pause)
         self.pause_btn.grid(row=1, column=0, sticky="NSEW")
-        self.reset_btn = tk.Button(self.playback_frame, text="RESET", command=self.reset_timer)
-        self.reset_btn.grid(row=2, column=0, sticky="NSEW")
+       
 
 
     # skip the image
     def skip_image(self, direction_idx):
-
-        self.skip_countdown()
+        self.is_skip = True
         self.slide_dir(direction_idx)
+        self.skip_countdown()
+        self.is_skip = False
 
     # === Slider Operator === #
-    def slide_dir(self, count):
+    def slide_dir(self, index_dir):
             
-        self.slide_idx += count
+        self.slide_idx  = self.slide_idx + index_dir
         list_idx = len(self.img_viewer_list)-1
 
         # Reset slider index if at RIGHT extreme
@@ -152,6 +163,8 @@ class TimerWindow():
 
         # Reset slider index if at LEFT extreme
         elif(self.slide_idx < 0) : self.slide_idx = 0
+
+        print(f"Current Slide_idx: {self.slide_idx} ")
     
         self.canvas = self.img_viewer_list[self.slide_idx].render_full_image(self.img_list_frame)
         self.canvas.grid(row=0, column=0, sticky=tk.NSEW)
@@ -182,34 +195,7 @@ class TimerWindow():
         self.canvas.create_text(self.img_width/2, self.img_height/2, text=f"Get ready for the \n NEXT DRAWING >>>",  fill="#f5f5f5", font=("Courier", 30, "bold" ))   
 
 
-    def get_and_validate_drawtime(self):
-        '''
-        Check if the draw time is valid value or through 
-        Valuerror warning if failed
-        @return int value
-        '''
-        default_entry = 30
-        try:
-            entry_value = self.drawtime_entry.get()
-
-            if(entry_value == ""): 
-                self.warning_label.config(text = "Time is empty, will use default")
-                return default_entry
-             
-            entry_value = int(float(entry_value))
-
-            if(entry_value == 0): 
-                self.warning_label.config(text = "Zero value, will use default")
-                return default_entry
-
-        except ValueError:
-            self.warning_label.config(text = "Invalid Input, will use default")
-            return default_entry
-
-        # All is good, Reset the warning label,
-        self.warning_label.config(text = "")
-
-        return entry_value 
+  
 
     # === Start Timer === #
     def start_timer(self):
@@ -221,11 +207,9 @@ class TimerWindow():
     # === Count down === #
     def count_down(self):
 
-        self.img_width = self.img_viewer_list[self.slide_idx].full_img.width() # canvas width
-
         # get the value assigned to slider
         self.short_break_sec = self.break_val.get()
-        self.draw_time_sec = self.get_and_validate_drawtime()
+        self.draw_time_sec = WidgetUtil.get_and_validate_drawtime(self.drawtime_entry, self.warning_label)
         self.reps += 1
 
         # switch between `initial time interval` and `break time interval`
@@ -241,14 +225,13 @@ class TimerWindow():
 
             # draw timer text on canvas
             self.min, self.sec = min_sec(self.draw_time_sec )
-            # start again is slide has reach the end
-            if self.slide_idx == len(self.img_viewer_list)-1 : self.slide_idx = 0
 
             self.time_interval = self.draw_time_sec
             self.update_timer(self.time_interval)
 
             # Next the image
-            self.slide_dir(1)
+            if self.reps > 1 and not self.is_skip : 
+                self.slide_dir(1)
 
             
 
@@ -270,7 +253,8 @@ class TimerWindow():
                 self.count_dwn = count_dwn
                 self.canvas.itemconfig(self.timer_text, text=f"{self.min:02d}:{self.sec:02d}")
                 self.pause_btn.config(state=tk.NORMAL)
-                self.reset_btn.config(state=tk.NORMAL)
+                # self.left_btn.config(state=tk.NORMAL)
+                self.right_btn.config(state=tk.NORMAL)
 
                  
             else:    
@@ -278,8 +262,7 @@ class TimerWindow():
                 self.canvas.itemconfig(self.timer_text, text=f"{self.sec}" )
                 # prohibit clicking of pause btn
                 self.pause_btn.config(state=tk.DISABLED)
-                self.reset_btn.config(state=tk.DISABLED)
-                self.left_btn.config(state=tk.DISABLED)
+                # self.left_btn.config(state=tk.DISABLED)
                 self.right_btn.config(state=tk.DISABLED)
                 
             # Count only positive values,
@@ -311,7 +294,6 @@ class TimerWindow():
         self.count_dwn = 0
         self.time_win.after_cancel(self.timer)
         self.canvas.itemconfig(self.timer_text , text="00:00")
-        self.start_btn.config(state=tk.NORMAL)
             
     # --------------------- SKIP TIMER --------------------------#############
     def skip_countdown(self):
