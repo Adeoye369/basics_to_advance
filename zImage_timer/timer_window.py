@@ -4,6 +4,8 @@ from tkinter import messagebox
 from utility import min_sec,load_image, WidgetUtil
 from PIL import ImageTk
 
+ROOT_DIR = "./zImage_timer"
+
 class TimerWindow():
 
     def __init__(self, image_viewer_list, timer_duration):
@@ -66,14 +68,14 @@ class TimerWindow():
         self.canvas.grid(row=0, column=0, sticky=tk.NSEW)
 
         # Left Button
-        self.left_btn_image = ImageTk.PhotoImage(load_image("./image_timer/assets/left_arrow.png", 50))
+        self.left_btn_image = ImageTk.PhotoImage(load_image(f"{ROOT_DIR}/assets/left_arrow.png", 50))
         self.left_btn = ttk.Button(self.img_list_frame, image=self.left_btn_image, command=lambda:self.skip_image(-1))
         self.left_btn.grid(row=0, column=0, sticky=tk.W)
         # 'Left' Keyboard bind
         self.time_win.bind("<Left>", lambda e : self.skip_image(-1) )
 
         # Right Button
-        self.right_btn_image = ImageTk.PhotoImage(load_image("./image_timer/assets/right_arrow.png", 50))
+        self.right_btn_image = ImageTk.PhotoImage(load_image(f"{ROOT_DIR}/assets/right_arrow.png", 50))
         self.right_btn = ttk.Button(self.img_list_frame, image=self.right_btn_image, command=lambda:self.skip_image(1))
         self.right_btn.grid(row=0, column=0, sticky=tk.E)
         # 'Right' Keyboard bind

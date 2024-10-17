@@ -12,8 +12,8 @@ def load_image(filepath, new_width = None, new_height= None, reduce_by=1) :
     reduce_by(float) : proportional resizing by value specified
 
     Returns:
-    Image : PIL class for Images '''
-    
+    Image : PIL class for Images 
+    '''
     import math
     img = Image.open(filepath)
 
