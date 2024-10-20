@@ -6,7 +6,8 @@ import tkinter.filedialog as fd
 from utility import load_image, WidgetUtil
 from timer_window import TimerWindow
 from image_viewer import ImageViewer
-
+from scrollable_frame import ScrollableFrame
+import time
 
 class Draw_App():
 
@@ -21,8 +22,14 @@ class Draw_App():
         # Create the basic 
         self.win = tk.Tk()
         self.win.title("Image Timer")
-        self.win.minsize(400, 200)
+        self.win.minsize(400, 300)
         self.win.config(padx=20, pady=20)
+
+        # value for grid division
+        self.image_grid_div = 4
+
+        #Get the current screen width and height
+        self.screen_size = self.win.winfo_screenwidth(), self.win.winfo_screenheight()
 
         self.display_UI()
 
@@ -31,24 +38,26 @@ class Draw_App():
 
     def openfile(self):
 
-        new_img_files = fd.askopenfilenames(parent=self.win, title="Choose a File")
-        print(self.win.splitlist(new_img_files))
+        self.new_img_files = fd.askopenfilenames(parent=self.win, title="Choose a File")
+        # print(self.win.splitlist(new_img_files))
 
-        if new_img_files:
-            self.display_images(new_img_files)
+        if self.new_img_files:
+            self.display_images()
 
     def display_UI(self):
         
         # Select image Frame
         self.select_frame = ttk.LabelFrame(self.win, text="", padding=(30, 30))
-        self.select_frame.pack(fill=tk.BOTH)
+        self.select_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.file_btn =  ttk.Button(self.select_frame, text="select Image files",  command=self.openfile, padding=(10, 20))
-        self.file_btn.pack()
+                # Display list Frame
+        self.images_frame = ScrollableFrame(self.win, padding=(10,10))
+        self.images_frame.pack_forget()
 
-        # Display list Frame
-        self.images_frame = ttk.LabelFrame(self.win, text="Selected Images", padding=(10, 10))
-        self.images_frame.pack(fill=tk.BOTH)
+        s = ttk.Style()
+        s.configure('my.TButton', font=('Helvetica', 20, 'bold'))
+        self.file_btn =  ttk.Button(self.select_frame, text="select Image files",  style='my.TButton', command=self.openfile, padding=(10, 20))
+        self.file_btn.pack(fill=tk.BOTH, ipady=30)
 
 
         # Set Timer option list Frame
@@ -60,29 +69,45 @@ class Draw_App():
         self.start_btn = ttk.Button(text="START", padding=(10, 10) )
         self.start_btn.pack_forget()
 
-    def display_images(self,img_files):
 
+    def resize_scrollable_frame(self, e):
+        time.sleep(0.05)
+        self.image_grid_div = e.width // 100
+
+        self.render_button_into_frame()
+
+
+    def render_button_into_frame(self):
+       
         # Reset the list if not empty
         if self.img_btn_list: 
             for img in self.img_btn_list: img.delete_image() # delete button in memory
             self.img_btn_list.clear() # empty the list
 
+       
         index = 0
         row_count = 0; col_count = 0
 
-        for img in img_files:
-            print(img)
-            row_count = index // 4
-            col_count =  index % 4
+        for img in self.new_img_files:
+            row_count = index // self.image_grid_div
+            col_count =  index % self.image_grid_div
 
-            new_img = ImageViewer()
-            new_img.process_image(img)
+
+            new_img = ImageViewer(screen_size=self.screen_size, image_path=img)
+            new_img.process_image()
             new_img.display_button(self.images_frame, row_count, col_count)
             # Add image to list
             self.img_btn_list.append(new_img)
             index+=1
 
+
+    def display_images(self):
+
+        self.images_frame.pack(fill=tk.BOTH)
+        self.images_frame.bind("<Configure>", self.resize_scrollable_frame)
         
+        self.render_button_into_frame()
+
 
         # display duration options
         self.display_duration_options_UI()
@@ -91,9 +116,6 @@ class Draw_App():
         self.start_btn.config(command=self.start_timer_window)
 
 
-    
-            
-
 
     def display_duration_options_UI(self):
         ''' Display time duration options User Interface '''
@@ -101,7 +123,7 @@ class Draw_App():
         # Radio Button ==============>
 
         def radio_action():
-            print(radio_value.get())
+            # print(radio_value.get())
             self.drawtime_entry.delete(0, tk.END)
             self.drawtime_entry.insert(tk.END,radio_value.get())
             self.time_duration = radio_value.get()
@@ -135,7 +157,7 @@ class Draw_App():
 
     def start_timer_window(self):
         self.time_duration = WidgetUtil.get_and_validate_drawtime(self.drawtime_entry, None)
-        t = TimerWindow(self.img_btn_list, self.time_duration)
+        t = TimerWindow(self.img_btn_list, self.time_duration, self.screen_size)
         t.loop()
 
 if __name__ == "__main__":

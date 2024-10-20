@@ -8,7 +8,7 @@ ROOT_DIR = "./zImage_timer"
 
 class TimerWindow():
 
-    def __init__(self, image_viewer_list, timer_duration):
+    def __init__(self, image_viewer_list, timer_duration, screen_size):
         ''' Takes the list of ImageView generated '''
 
         # stores the ImageViewer list and duration
@@ -19,7 +19,7 @@ class TimerWindow():
         # store slide index
         self.slide_idx = 0
 
-                # help to know when to switch countdown display
+        # help to know when to switch countdown display
         self.is_break = False 
 
         # when to skip the draw timer
@@ -33,20 +33,39 @@ class TimerWindow():
         self.count_dwn = 0 # keep track of count for pause/play
 
         self.canvas = None
+        self.canvas_width = 0
+        self.canvas_height = 0
+        self.screen_size = screen_size
+
         self.drawtime_entry = None
         self.timer = None
+
         self.timer_text = None
+        self.timer_text_sh = None
         self.min = 0
         self.sec = 0
 
+
         self.time_win = tk.Toplevel()
-        self.time_win.minsize(300, 300)
+        self.time_win.state('zoomed')
+        
+        # resize the
+        self.time_win.config(width=self.screen_size[0], height=self.screen_size[1])
         self.time_win.title("")
+        
+
+        self.time_win.grid_rowconfigure(0, weight=1)
+        self.time_win.grid_columnconfigure(1, weight=8)
+
+        self.time_win.grid_rowconfigure(1, weight=1)
+        self.time_win.grid_columnconfigure(0, weight=1)
+
+
 
 
         # print all image name and thumb tk
-        for idx, img in enumerate( self.img_viewer_list ) :
-            print(f"index: {idx}, {img.name}, {img.thumb_img}")
+        # for idx, img in enumerate( self.img_viewer_list ) :
+        #     # print(f"index: {idx}, {img.name}, {img.thumb_img}")
 
         self.displayUI()
 
@@ -54,18 +73,19 @@ class TimerWindow():
     def displayUI(self):
         # UI for the labels
         self.settings_frame = tk.LabelFrame(self.time_win, text="settings", padx=10, pady=10)
-        self.settings_frame.grid(row=0, column=0, sticky="NSEW")
-
         self.img_list_frame = tk.LabelFrame(self.time_win, text="Image", padx=10, pady=10)
-        self.img_list_frame.grid(row=0, column=1, rowspan=2)
 
-
+        self.img_list_frame.rowconfigure(0, weight=1)
+        self.img_list_frame.columnconfigure(0, weight=1)
+                
+        self.settings_frame.grid(row=0, column=0, sticky="NSEW")
+        self.img_list_frame.grid(row=0, column=1, rowspan=2, sticky="NSEW")
 
         self.create_menu_UI()
-
         # Display the image select in the 
         self.canvas = self.img_viewer_list[0].render_full_image(self.img_list_frame)
         self.canvas.grid(row=0, column=0, sticky=tk.NSEW)
+
 
         # Left Button
         self.left_btn_image = ImageTk.PhotoImage(load_image(f"{ROOT_DIR}/assets/left_arrow.png", 50))
@@ -85,13 +105,14 @@ class TimerWindow():
         self.start_timer()
         self.slide_dir(0)
 
+
     
     def create_menu_UI(self):
         ### ================= MENU FRAME =================== ### 
         # Radio Button to display time select
         # Radio Button ==============>
         def radio_action():
-            print(radio_value.get())
+            # print(radio_value.get())
             self.drawtime_entry.delete(0, tk.END)
             self.drawtime_entry.insert(tk.END,radio_value.get())
             self.time_duration = radio_value.get()
@@ -118,7 +139,6 @@ class TimerWindow():
         self.drawtime_label = tk.Label(self.settings_frame, text="Time(sec)")
 
         self.drawtime_entry = tk.Entry(self.settings_frame, width=8)
-        print(f"passing in time_duration: {self.time_duration}" )
         self.drawtime_entry.insert(tk.END, string=f"{self.time_duration}")
 
 
@@ -142,10 +162,11 @@ class TimerWindow():
         
         self.playback_frame.grid(row=1, column=0, sticky="NSEW")
         self.playback_frame.columnconfigure(0, weight=1)
+        self.playback_frame.rowconfigure(0, weight=1)
 
 
         self.pause_btn = tk.Button(self.playback_frame, text="PAUSE", command=self.play_pause)
-        self.pause_btn.grid(row=1, column=0, sticky="NSEW")
+        self.pause_btn.grid(row=0, column=0, sticky="WE")
 
 
     # skip the image
@@ -155,6 +176,16 @@ class TimerWindow():
         self.skip_countdown()
         self.is_skip = False
 
+    def canvas_counter_text(self, cvs_width):
+
+        if not self.is_break:
+            self.canvas.delete(self.timer_text)
+            self.canvas.delete(self.timer_text_sh)
+            self.timer_text = self.canvas.create_text(cvs_width-99, 31, text=f"{self.min:02d}:{self.sec:02d}", fill="#555", font=("Helvatica", 20, "bold" ))
+            self.timer_text_sh = self.canvas.create_text(cvs_width-100, 30, text=f"{self.min:02d}:{self.sec:02d}", fill="#fff", font=("Helvatica", 20, "bold" ))
+        else:
+            self.timer_text = self.canvas.create_text(self.canvas.winfo_width()-30, 30, text=f"{self.short_break_sec}", fill="#f9f9f9", font=("Courier", 20, "bold" ))
+        
 
     # === Slider Operator === #
     def slide_dir(self, index_dir):
@@ -166,8 +197,12 @@ class TimerWindow():
         if (self.slide_idx > list_idx ): 
             self.slide_idx = list_idx
             self.is_start_countdown = False
-            response = messagebox.askyesnocancel("End of Slide", "Congratulations you are done!!! \n Do you want to close the window? ", parent=self.time_win)
-            if(response == True):
+            # response = messagebox.askyesnocancel("End of Slide", "Congratulations you are done!!!  ", parent=self.time_win)
+            response = messagebox.showinfo("End of Slide", "Congratulations you are done!!!  ", parent=self.time_win)
+            print(response)
+            if(response == "ok"):
+                for widg in self.time_win.winfo_children():
+                    widg.destroy()
                 self.time_win.destroy()
                 
             else:
@@ -176,17 +211,16 @@ class TimerWindow():
 
         # Reset slider index if at LEFT extreme
         elif(self.slide_idx < 0) : self.slide_idx = 0
-
-        print(f"Current Slide_idx: {self.slide_idx} ")
     
         self.canvas = self.img_viewer_list[self.slide_idx].render_full_image(self.img_list_frame)
         self.canvas.grid(row=0, column=0, sticky=tk.NSEW)
 
             # draw timer text on canvas
-        self.img_width = self.img_viewer_list[self.slide_idx].full_img.width() # canvas width 
+        self.canvas.update()
+        self.canvas_width = self.canvas.winfo_width() # canvas width 
         self.img_height = self.img_viewer_list[self.slide_idx].full_img.height() # canvas height
 
-        self.timer_text = self.canvas.create_text(self.img_width-30, 30, text=f"{self.min:02d}:{self.sec:02d}", fill="#f9f9f9", font=("Courier", 20, "bold" ))
+        self.canvas_counter_text(self.canvas_width)
         self.update_window_title()
 
         # Put Left and right button on top of canvas
@@ -201,15 +235,16 @@ class TimerWindow():
     def draw_blank_canvas(self):
         # draw blank canvas
             # Creates a rectangle of 60 x 50 (width x height)
+        self.canvas.delete("all")
         pos_x = 0
         pos_y = 0
         self.canvas.create_rectangle(pos_x, pos_y, 
-                                        self.img_width + pos_x + 10, # pos_x(10) + width(500)
-                                        self.img_height + pos_y + 10, # pos_y(10) + height(400)
+                                        self.canvas.winfo_width() + pos_x + 10, # pos_x(10) + width(500)
+                                        self.canvas.winfo_height() + pos_y + 10, # pos_y(10) + height(400)
                                     outline = "white", fill = "gray",
                                     width = 2)
-        self.timer_text = self.canvas.create_text(self.img_width-30, 30, text=f"{self.short_break_sec}", fill="#f9f9f9", font=("Courier", 20, "bold" ))
-        self.canvas.create_text(self.img_width/2, self.img_height/2, text=f"Get ready for the \n NEXT DRAWING >>>",  fill="#f5f5f5", font=("Courier", 30, "bold" ))   
+        self.canvas_counter_text(self.canvas_width)
+        self.canvas.create_text(self.canvas.winfo_width()/2, self.canvas.winfo_height()/2, text=f"Get ready for the \n NEXT DRAWING >>>",  fill="#f5f5f5", font=("Courier", 30, "bold" ))   
         self.time_win.title("")
 
   
@@ -269,9 +304,10 @@ class TimerWindow():
                 # Update canvas text normal interval
                 self.count_dwn = count_dwn
                 self.canvas.itemconfig(self.timer_text, text=f"{self.min:02d}:{self.sec:02d}")
+                self.canvas.itemconfig(self.timer_text_sh, text=f"{self.min:02d}:{self.sec:02d}")
                 self.update_window_title()
                 self.pause_btn.config(state=tk.NORMAL)
-                # self.left_btn.config(state=tk.NORMAL)
+                self.left_btn.config(state=tk.NORMAL)
                 self.right_btn.config(state=tk.NORMAL)
 
                  
@@ -280,7 +316,7 @@ class TimerWindow():
                 self.canvas.itemconfig(self.timer_text, text=f"{self.sec}" )
                 # prohibit clicking of pause btn
                 self.pause_btn.config(state=tk.DISABLED)
-                # self.left_btn.config(state=tk.DISABLED)
+                self.left_btn.config(state=tk.DISABLED)
                 self.right_btn.config(state=tk.DISABLED)
                 
             # Count only positive values,
@@ -319,7 +355,19 @@ class TimerWindow():
         self.reset_timer()
         self.start_timer()
 
+    def resize_items_on_canvas(self, event):
+        
+        # print(f"{event.height, event.width}")
+        self.canvas_width = event.width
+        self.canvas_height = event.height
+
+        if not self.is_break:
+            self.canvas_counter_text(self.canvas_width)
+        else:
+            self.draw_blank_canvas()
+
 
 
     def loop(self):
+        self.canvas.bind("<Configure>", self.resize_items_on_canvas)
         self.time_win.mainloop()

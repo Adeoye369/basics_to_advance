@@ -34,33 +34,33 @@ driver = webdriver.Chrome(options=chrom_options)
 driver.get("https://docs.google.com/forms/d/e/1FAIpQLSescRSkofMMxnEiZ9VQTHJni15Nn3iOmoqWJkmkSjPDOH4CvQ/viewform?usp=sf_link")
     
 # wait 3secs
-time.sleep(8)
+time.sleep(5)
 
 for info in house_data[:10]:
 
     # fill the address
     addr_form = driver.find_element(By.XPATH, value='//*[@id="mG61Hd"]/div[2]/div/div[2]/div[1]/div/div/div[2]/div/div[1]/div/div[1]/input')
-    addr_form.click()
-    addr_form.send_keys(info["addr"])
+    # addr_form.click()
+    addr_form.send_keys(info["addr"], Keys.ENTER)
     time.sleep(1)
 
     # # fill the price
     price_form = driver.find_element(By.XPATH, value='//*[@id="mG61Hd"]/div[2]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div[1]/input')
-    price_form.click()
-    price_form.send_keys(info['price'])
+    # price_form.click()
+    price_form.send_keys(info['price'], Keys.ENTER)
     time.sleep(1)
 
 
     # # fill in the link
     link_form = driver.find_element(By.XPATH, value='//*[@id="mG61Hd"]/div[2]/div/div[2]/div[3]/div/div/div[2]/div/div[1]/div/div[1]/input')
-    link_form.click()
-    link_form.send_keys(info['link'])
+    # link_form.click()
+    link_form.send_keys(info['link'], Keys.ENTER)
     time.sleep(1)
 
     submit = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[3]/div[1]/div[1]/div')
     submit.click()
 
-    time.sleep(5)
+    time.sleep(3)
     
     driver.get("https://docs.google.com/forms/d/e/1FAIpQLSescRSkofMMxnEiZ9VQTHJni15Nn3iOmoqWJkmkSjPDOH4CvQ/viewform?usp=sf_link")
 
