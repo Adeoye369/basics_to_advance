@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Flex box</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <style>
+            .container {
+                display: flex;
+                gap: 5px;
+                margin-bottom: 20px;
+            }
+
+            .section{
+                background-color: #eee;
+                padding: 5px;
+            }
+
+            .box{
+                display: flex;
+                border: 2px dashed green;
+                gap: 5px; 
+            }
+
+            .box *{background-color: antiquewhite;}
+            .box > img{width: 250px;}
+
+          
+            nav {background-color: orange;
+                display: flex; gap:5px; 
+                height: 40px;
+                justify-content: center;
+            }
+            nav a{color: white;text-decoration: none;
+                font-size: 1rem;font-weight: 400;}
+
+            li{list-style: none; border: 1px solid saddlebrown;}
+
+            /* COLOR SECTIONS ====================== */
+            section.color{
+                display:flex; 
+             
+                background-color: aquamarine;   
+                margin-top: 20px;        
+            }
+
+            section.color > div{
+                border: 1px solid #00ff7b;
+                height: 40px;
+                flex-basis: 100px;
+            }
+
+            section.color > div:nth-child(even){
+                background-color: orange;
+            }
+            section.color > div:nth-child(odd){
+                background-color: rgb(205, 255, 67);
+            }
+        </style>
+    </head>
+    <body>
+            <nav>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Categories</a></li>
+                    <li><a href="">Dashboard</a></li>
+                    <li><a href="#">Sign up</a></li>
+                    <li><a href="#">About</a></li>
+            </nav>
+   
+            <section class="container">
+                <div class="section">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dapibus, dui id pulvinar tincidunt, 
+                </div>
+                <div class="section">
+                    Aliquam erat volutpat.
+                </div>
+                <div class="section">
+                    Curabitur varius sagittis quam, ut euismod justo imperdiet eu. Nunc pulvinar mauris sed tortor dapibus, vel commodo diam pellentesque. Aenean maximus ex suscipit eleifend porttitor. Cras ultrices bibendum vestibulum. Morbi scelerisque ultrices blandit. Nunc dapibus eros non enim convallis, ac posuere ipsum lobortis. Nulla tristique sit amet orci et ultricies. Aliquam ac elit imperdiet, malesuada nulla eu, feugiat turpis.
+                </div>
+            </section>
+
+            <section class="box">
+                <p>Nam euismod nisl </p>
+                <span> somee span element here</span>
+                <div>this is another div</div>
+                <img src="../page01/images/simp_draw.png"  alt="">
+            </section>
+
+            <section class="color">
+                <div>1</div>
+                <div>2</div>
+                <div>3e</div>
+                <div>err</div>
+                <div>s</div>
+                <div>rttl</div>
+                <div>23</div>
+                <div>900</div>
+                <div>asd</div>
+                <div>111</div>
+                <div>0l3</div>
+                <div>9</div>
+            </section>
+        <script src="" async defer></script>
+    </body>
+</html>

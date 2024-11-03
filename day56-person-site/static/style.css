@@ -1,0 +1,18 @@
+body{
+    background-color: #dadaff;
+}
+
+body {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80%);
+    text-align: center;
+}
+
+body div{
+    background-color: #ffffdf;
+    padding: 20px;
+    border-radius: 10px;
+}
+

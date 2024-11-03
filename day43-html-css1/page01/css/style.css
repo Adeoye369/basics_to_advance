@@ -1,0 +1,95 @@
+*{ 
+    text-align: center;
+}
+
+body{
+    
+    font-family: sans-serif;
+}
+
+
+
+.container h1{
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #ff00aa;
+}
+
+.container p{
+    text-align: center;
+    background-color: rgb(255, 137, 137);
+    border: 1px solid gray; 
+    color: antiquewhite;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+
+.blue-heading{
+    color:blue;
+}
+
+#green-heading{
+color: green;
+}
+
+h2{
+    color: red;
+}
+
+p[data]{
+    background-color: blueviolet;
+}
+
+h1[someattr]{
+    font-style: italic;
+    color:chocolate;
+}
+
+li{
+    color: red;
+    color: blue;
+}
+
+ul{
+
+    list-style-type:none;
+    padding: 10px;
+
+}
+div li {
+    position: relative;
+    color: #aa00ff;
+    font-size: 1.2rem;
+}
+
+div li:nth-child(odd){
+    background-color: #ff00aa;
+    color: wheat;
+}
+
+div li>span{
+    position: absolute;
+    top: 0px;
+    left: 5px;
+}
+
+div.content > p {
+    background-color: greenyellow;
+    display: inline-block;
+    padding: 10px 5px;
+    height: 100px;
+
+}
+
+div.content > p:nth-child(1){
+    background-color: green;
+    color : yellow;
+}
+
+/* class `description` script */
+div.description img{
+    width: 200px;
+    float: left;
+    margin-left: 30px;
+    margin-top: 10px;
+}
