@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo page</title>
+
+    <style>
+        .container{
+            background-color: bisque;
+            padding: 5px;
+
+            display: grid;
+            grid-template-columns: repeat(3, minmax(50px, 1fr));
+            grid-template-rows: repeat(3, 50px);
+            grid-auto-rows: 50px;
+            gap: 5px;
+        }
+
+        .items{
+            background-color: #987dd7;
+        }
+
+        .first{
+            /* grid-row: span 2; */
+            grid-area: 1 / 1 / 6 / 2;
+            background-color: #41d546;
+        }
+
+        .that{
+            /* grid-column: span 3; */
+            background-color: #ff000090;
+            grid-area: 3 / 1 / 5 / 4;
+        }
+
+    </style>
+</head>
+<body>
+    <section class="container">
+        <div class="items first">items</div>
+        <div class="items">one </div>
+        <div class="items">some </div>
+        <div class="items">good </div>
+        <div class="items">object </div>
+        <div class="items">that </div>
+        <div class="items">will </div>
+        <div class="items this">show</div>
+        <div class="items that">that </div>
+        <div class="items">will </div>
+        <div class="items">show</div>
+        
+    </section>
+</body>
+</html>
