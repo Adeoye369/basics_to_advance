@@ -1,9 +1,6 @@
 
 body{
     background-color: rgb(44, 34, 72);
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-image: radial-gradient(#ac9bc64d, #1f062fdd);
 }
 
@@ -24,5 +21,16 @@ body{
 h2, p{
     font-family:cursive;
     color: brown;
+}
+
+.foot-title{
+    align-self: flex-end;
+    display: flex;
+    justify-content: center;
+    background-image: linear-gradient(to bottom, #ac9bc611, #1f062fdd );
+}
+
+.foot-title p {
+    color: #f0b4f9;
 }
 
