@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players Stats</title>
+</head>
+<body>
+    <main>
+        <section>
+            
+            {% if not players %}
+                    
+                <div>
+                    <h1>No player availabe</h1>
+                </div>
+            
+            {% else %}
+         
+                <header>
+                    <div>
+                        <h1> ----- Name ------ | ----  <span>Role -----</span></h1>
+                    </div>
+                </header>
+                
+                {% for pl in players %}
+                        <div>
+                            <h1> {{pl['id']}} - {{pl['name']}}  - <span> Roles {{pl['role']}}  </span></h1>
+                            <hr>
+                        </div>
+                {% endfor %}
+
+            {% endif %}
+       
+                
+
+         
+
+        </section>
+
+    </main>
+</body>
+</html>

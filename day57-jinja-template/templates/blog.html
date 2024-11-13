@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        main{
+            margin: 0 auto;
+            width: 80vw;
+        }
+
+        div[data-id]{
+            background-color: bisque;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+            width: 80vw;
+            height: 80vh;
+        }
+
+        div[data-content]{
+            background-color:azure ;
+        }
+    </style>
+</head>
+<body>
+    
+    <main>
+            <div  data-id >
+            {% for blog in blog_post:  %}
+            <div class="blog-content" >
+                <h1 class="blog-title"> {{blog['title']}} </h1>
+                
+                <h3 class="blog-subtitle"> {{blog['subtitle']}} </h3>
+                <div class="blog-body" data-content>
+                    {{blog['body']}}
+                </div>
+                <hr>
+            </div>
+            {% endfor %}
+        </div >
+    </main>
+
+
+</body>
+</html>
